@@ -9,11 +9,26 @@ days = st.slider("Forecast Days", min_value=1, max_value=5,
 option = st.selectbox("Select data to view", ("Temperature", "Sky"))
 st.subheader(f"{option} for the next {days} days in {place}")
 
-dates = ["2023-09-30", "2023-10-01", "2023-10-02", "2023-10-03", "2023-10-04", "2023-10-05"]
-temperatures = [27.1, 27.2, 26.6, 26.4, 26.9, 26.5]
+if place:
+    weather_data = get_weather_data(place, days, option)
+    if option == "Temperature":
+        temp_data = []
+        temp_date = []
+        for data in weather_data:
+            temp_data.append(data['temperature'])
+            temp_date.append(data['date'])
+        # Temperature plot
+        figure = px.line(x=temp_date, y=temp_data,
+                         labels={"x": "Date", "y": "Temperature (C)"})
+        st.plotly_chart(figure)
 
-weather_data = get_weather_data(place, days, option)
-
-figure = px.line(x=dates, y=temperatures,
-                 labels={"x": "Date", "y": "Temperature (C)"})
-st.plotly_chart(figure)
+    if option == "Sky":
+        # Sky render
+        sky_data = []
+        sky_img = []
+        sky_date = []
+        for data in weather_data:
+            sky_data.append(data['description'])
+            sky_img.append(data['img'])
+            sky_date.append(data['date'])
+        st.image(sky_img, width=100, caption=sky_date)
